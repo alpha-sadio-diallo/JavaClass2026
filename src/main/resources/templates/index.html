@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokédex</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #fff7d6, #dfefff);
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #d72323;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+        }
+        input {
+            width: 300px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+        }
+        .card {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            margin-top: 30px;
+        }
+        .card img {
+            width: 220px;
+            height: 220px;
+            object-fit: contain;
+        }
+        .stats {
+            list-style: none;
+            padding: 0;
+        }
+        .stats li {
+            margin: 8px 0;
+        }
+        .error {
+            color: #c0392b;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Pokédex</h1>
+
+    <form method="get">
+        <input type="text" name="search" placeholder="Ex : pikachu ou 25" th:value="${param.search != null ? param.search[0] : ''}" />
+        <button type="submit">Chercher</button>
+    </form>
+
+    <div th:if="${pokemon != null}">
+        <div class="card">
+            <img th:src="${pokemon.imageUrl}" th:alt="${pokemon.name}" />
+            <div>
+                <h2 th:text="${pokemon.name}">Nom</h2>
+                <p><strong>N°</strong> <span th:text="${pokemon.id}"></span></p>
+                <p><strong>Taille :</strong> <span th:text="${pokemon.height / 10.0}"></span> m</p>
+                <p><strong>Poids :</strong> <span th:text="${pokemon.weight / 10.0}"></span> kg</p>
+                <p><strong>Types :</strong> <span th:text="${#strings.listJoin(pokemon.types, ' / ')}"></span></p>
+                <p><strong>Capacités :</strong> <span th:text="${#strings.listJoin(pokemon.abilities, ', ')}"></span></p>
+            </div>
+        </div>
+
+        <h3>Statistiques</h3>
+        <ul class="stats">
+            <li th:each="stat : ${pokemon.stats}">
+                <span th:text="${stat.name}"></span> : <strong th:text="${stat.value}"></strong>
+            </li>
+        </ul>
+    </div>
+
+    <div class="error" th:if="${error != null}" th:text="${error}"></div>
+</div>
+</body>
+</html>
