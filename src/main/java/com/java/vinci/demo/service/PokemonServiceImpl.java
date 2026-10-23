@@ -52,7 +52,9 @@ public class PokemonServiceImpl implements IPokemonService {
             fetchedPokemons.add(pokemon);
         }
 
-        pokemons = List.copyOf(fetchedPokemons);
+
+        // classer les pokemons par leur puissance d'attaque (attack) en ordre décroissant
+        fetchedPokemons.sort((p1, p2) -> Integer.compare(p2.getStats().getAttack(), p1.getStats().getAttack()));
         return pokemons;
     }
 
