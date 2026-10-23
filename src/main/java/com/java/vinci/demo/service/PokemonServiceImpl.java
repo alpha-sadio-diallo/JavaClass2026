@@ -48,6 +48,7 @@ public class PokemonServiceImpl implements IPokemonService {
             pokemon.setStats(extractStats(details.get("stats")));
             pokemon.setImageUrl(extractImageUrl(details.get("sprites")));
             pokemon.setImageUrl(extractImageUrl(details.get("sprites")));
+            pokemon.setCapacites(extractCapacities(details.get("abilities")));
             fetchedPokemons.add(pokemon);
         }
 
@@ -81,6 +82,25 @@ public class PokemonServiceImpl implements IPokemonService {
             return url;
         }
         return null;
+    }
+
+    private String[] extractCapacities(Object capacitiesValue) {
+        if (!(capacitiesValue instanceof List<?> capacities)) {
+            throw new IllegalStateException(
+                    "PokeAPI returned an invalid Pokémon abilities value");
+        }
+
+        List<String> names = new ArrayList<>();
+
+        for (Object capacityValue : capacities) {
+            if (capacityValue instanceof Map<?, ?> capacity
+                    && capacity.get("ability") instanceof Map<?, ?> ability
+                    && ability.get("name") instanceof String name) {
+                names.add(name);
+            }
+        }
+
+        return names.toArray(String[]::new);
     }
 
 
