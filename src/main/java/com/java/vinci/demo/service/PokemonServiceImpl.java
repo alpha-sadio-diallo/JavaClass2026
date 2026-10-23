@@ -15,8 +15,7 @@ import java.util.Map;
 public class PokemonServiceImpl implements IPokemonService {
     private final String apiUrl = "https://pokeapi.co/api/v2/pokemon/";
     private final RestClient restClient = RestClient.create();
-    private List<Pokemon> pokemons = List.of();
-
+    private final List<Pokemon> fetchedPokemons = new ArrayList<>();
     @Override
     public List<Pokemon> getAllPokemons() {
         ApiResponseModel response = restClient.get()
@@ -28,7 +27,7 @@ public class PokemonServiceImpl implements IPokemonService {
             throw new IllegalStateException("PokeAPI returned an empty Pokémon list");
         }
 
-        List<Pokemon> fetchedPokemons = new ArrayList<>();
+        
         for (Map<String, String> pokemonData : response.getResults()) {
             Map<String, Object> details = restClient.get()
                     .uri(pokemonData.get("url"))
@@ -52,8 +51,10 @@ public class PokemonServiceImpl implements IPokemonService {
             fetchedPokemons.add(pokemon);
         }
 
-        pokemons = List.copyOf(fetchedPokemons);
-        return pokemons;
+
+        // classer les pokemons par leur puissance d'attaque (attack) en ordre décroissant
+        fetchedPokemons.sort((p1, p2) -> Integer.compare(p2.getStats().getAttack(), p1.getStats().getAttack()));
+        return fetchedPokemons;
     }
 
     // ici j'extrait les types
@@ -134,8 +135,9 @@ public class PokemonServiceImpl implements IPokemonService {
 
     @Override
     public Pokemon getPokemonByName(String name) {
-        for (Pokemon pokemon : pokemons) {
-            if (pokemon.getName().equalsIgnoreCase(name)) {
+        String lowerCaseName = name.toLowerCase();
+        for (Pokemon pokemon : fetchedPokemons) {
+            if (pokemon.getName().toLowerCase().contains(lowerCaseName)) {
                 return pokemon;
             }
         }
