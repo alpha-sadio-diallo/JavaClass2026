@@ -1,7 +1,7 @@
 ## Auteurs
 
-Alpha Sadio Diallo
-Mamadou Hachimiou Diallo
+Alpha Sadio DIALLO
+Mamadou Hachimiou DIALLO
 
 # Pokédex Java Spring Boot
 
