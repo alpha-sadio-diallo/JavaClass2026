@@ -11,7 +11,7 @@
             padding: 40px;
         }
         .container {
-            max-width: 900px;
+            max-width: 980px;
             margin: auto;
             background: white;
             border-radius: 20px;
@@ -22,14 +22,15 @@
             text-align: center;
             color: #d72323;
         }
-        form {
+        .search-form {
             display: flex;
             justify-content: center;
             gap: 10px;
+            flex-wrap: wrap;
             margin: 30px 0;
         }
-        input {
-            width: 300px;
+        input, select {
+            width: 220px;
             padding: 12px;
             border-radius: 10px;
             border: 1px solid #ccc;
@@ -41,6 +42,9 @@
             background: #3b82f6;
             color: white;
             cursor: pointer;
+        }
+        .secondary-button {
+            background: #f59e0b;
         }
         .card {
             display: flex;
@@ -60,6 +64,33 @@
         .stats li {
             margin: 8px 0;
         }
+        .compare-box {
+            margin-top: 20px;
+            background: #f8fafc;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .compare-box strong {
+            color: #1e3a8a;
+        }
+        .pokemon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .pokemon-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            background: #f9fafb;
+        }
+        .pokemon-item strong {
+            display: block;
+            margin-top: 6px;
+        }
         .error {
             color: #c0392b;
             font-weight: bold;
@@ -72,8 +103,16 @@
 <div class="container">
     <h1>Pokédex</h1>
 
-    <form method="get">
+    <form method="get" class="search-form">
         <input type="text" name="search" placeholder="Ex : pikachu ou 25" th:value="${param.search != null ? param.search[0] : ''}" />
+        <select name="compare" th:value="${param.compare != null ? param.compare[0] : ''}">
+            <option value="">Choisir un Pokémon à comparer</option>
+            <option th:each="pokemonOption : ${pokemonList}"
+                    th:value="${pokemonOption.name}"
+                    th:text="${pokemonOption.id + ' - ' + pokemonOption.name}"
+                    th:selected="${param.compare != null and param.compare[0] == pokemonOption.name}">
+            </option>
+        </select>
         <button type="submit">Chercher</button>
     </form>
 
@@ -90,12 +129,32 @@
             </div>
         </div>
 
+        <div class="compare-box" th:if="${comparisonPokemon != null and attackDifference != null}">
+            <strong>Comparaison d'attaque :</strong>
+            <span th:text="${pokemon.name + ' a ' + searchedAttack + ' d\'attaque, tandis que ' + comparisonPokemon.name + ' a ' + comparedAttack + '. Différence : ' + attackDifference + '.'}"></span>
+        </div>
+
         <h3>Statistiques</h3>
         <ul class="stats">
             <li th:each="stat : ${pokemon.stats}">
                 <span th:text="${stat.name}"></span> : <strong th:text="${stat.value}"></strong>
             </li>
         </ul>
+    </div>
+
+    <div th:if="${pokemonList != null}">
+        <h3>Les 50 premiers Pokémon</h3>
+        <div class="pokemon-grid">
+            <div class="pokemon-item" th:each="pokemonEntry : ${displayedPokemon}">
+                <span th:text="${pokemonEntry.id}"></span>
+                <strong th:text="${pokemonEntry.name}"></strong>
+            </div>
+        </div>
+
+        <form method="get" th:if="${hasMorePokemon}">
+            <input type="hidden" name="showAll" value="true" />
+            <button type="submit" class="secondary-button">Voir plus</button>
+        </form>
     </div>
 
     <div class="error" th:if="${error != null}" th:text="${error}"></div>
