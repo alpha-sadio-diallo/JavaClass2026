@@ -1,5 +1,6 @@
 package com.pokedex.model;
 
+// Représente une statistique Pokémon (nom + valeur), comme Attack, Defense ou Speed.
 public class Stat {
     private String name;
     private int value;

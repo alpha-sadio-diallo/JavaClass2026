@@ -2,11 +2,13 @@ package com.pokedex.service;
 
 import com.pokedex.api.PokeApiClient;
 import com.pokedex.model.Pokemon;
+import com.pokedex.model.PokemonComparisonResult;
 import com.pokedex.model.Stat;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// Service métier qui centralise les appels à PokéAPI et la logique de comparaison de puissance d'attaque.
 @Service
 public class PokeApiService {
     private final PokeApiClient pokeApiClient;
@@ -23,16 +25,24 @@ public class PokeApiService {
         return pokeApiClient.getPokemonList(limit, offset);
     }
 
-    public int getAttackDifference(String firstPokemonName, String secondPokemonName) {
-        int firstAttack = getAttackValue(firstPokemonName);
-        int secondAttack = getAttackValue(secondPokemonName);
+    public PokemonComparisonResult compareAttack(String firstPokemonName, String secondPokemonName) {
+        Pokemon firstPokemon = getPokemon(firstPokemonName);
+        Pokemon secondPokemon = getPokemon(secondPokemonName);
 
-        return Math.abs(firstAttack - secondAttack);
+        int firstAttack = getAttackValue(firstPokemon);
+        int secondAttack = getAttackValue(secondPokemon);
+
+        return new PokemonComparisonResult(firstPokemon.getName(), secondPokemon.getName(), firstAttack, secondAttack);
     }
 
     public int getAttackValue(String pokemonName) {
         Pokemon pokemon = getPokemon(pokemonName);
         return getAttackValue(pokemon);
+    }
+
+    public int getAttackDifference(String firstPokemonName, String secondPokemonName) {
+        PokemonComparisonResult result = compareAttack(firstPokemonName, secondPokemonName);
+        return result.getDifference();
     }
 
     private int getAttackValue(Pokemon pokemon) {

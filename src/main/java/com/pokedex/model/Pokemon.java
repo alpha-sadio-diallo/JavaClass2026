@@ -3,8 +3,8 @@ package com.pokedex.model;
 import java.util.ArrayList;
 import java.util.List;
 
+// Représente un Pokémon avec ses informations principales, ses types, ses capacités et ses statistiques.
 public class Pokemon {
-    // Modèle Java pour stocker les données renvoyées par l'API Pokémon.
     private int id;
     private String name;
     private int height;

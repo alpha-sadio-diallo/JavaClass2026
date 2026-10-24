@@ -74,6 +74,38 @@
         .compare-box strong {
             color: #1e3a8a;
         }
+        .duel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+        .duel-card {
+            border: 1px solid #dfe7f3;
+            border-radius: 16px;
+            padding: 18px;
+            background: linear-gradient(180deg, #ffffff, #f8fbff);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.06);
+        }
+        .duel-card h3 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .duel-card img {
+            display: block;
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            margin: 0 auto 12px;
+        }
+        .duel-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .duel-card li {
+            margin: 6px 0;
+        }
         .pokemon-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -129,9 +161,35 @@
             </div>
         </div>
 
-        <div class="compare-box" th:if="${comparisonPokemon != null and attackDifference != null}">
+        <div class="compare-box" th:if="${comparisonPokemon != null and comparisonResult != null}">
             <strong>Comparaison d'attaque :</strong>
-            <span th:text="${pokemon.name + ' a ' + searchedAttack + ' d\'attaque, tandis que ' + comparisonPokemon.name + ' a ' + comparedAttack + '. Différence : ' + attackDifference + '.'}"></span>
+            <span th:text="${comparisonResult.message}"></span>
+        </div>
+
+        <div class="duel-grid" th:if="${comparisonPokemon != null and comparisonResult != null}">
+            <div class="duel-card">
+                <h3 th:text="${pokemon.name}">Pokémon 1</h3>
+                <img th:src="${pokemon.imageUrl}" th:alt="${pokemon.name}" />
+                <ul>
+                    <li><strong>N°</strong> <span th:text="${pokemon.id}"></span></li>
+                    <li><strong>Type :</strong> <span th:text="${#strings.listJoin(pokemon.types, ' / ')}"></span></li>
+                    <li><strong>Attaque :</strong> <span th:text="${searchedAttack}"></span></li>
+                    <li><strong>Taille :</strong> <span th:text="${pokemon.height / 10.0}"></span> m</li>
+                    <li><strong>Poids :</strong> <span th:text="${pokemon.weight / 10.0}"></span> kg</li>
+                </ul>
+            </div>
+
+            <div class="duel-card">
+                <h3 th:text="${comparisonPokemon.name}">Pokémon 2</h3>
+                <img th:src="${comparisonPokemon.imageUrl}" th:alt="${comparisonPokemon.name}" />
+                <ul>
+                    <li><strong>N°</strong> <span th:text="${comparisonPokemon.id}"></span></li>
+                    <li><strong>Type :</strong> <span th:text="${#strings.listJoin(comparisonPokemon.types, ' / ')}"></span></li>
+                    <li><strong>Attaque :</strong> <span th:text="${comparedAttack}"></span></li>
+                    <li><strong>Taille :</strong> <span th:text="${comparisonPokemon.height / 10.0}"></span> m</li>
+                    <li><strong>Poids :</strong> <span th:text="${comparisonPokemon.weight / 10.0}"></span> kg</li>
+                </ul>
+            </div>
         </div>
 
         <h3>Statistiques</h3>

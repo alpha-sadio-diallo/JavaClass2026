@@ -1,6 +1,7 @@
 package com.pokedex.controller;
 
 import com.pokedex.model.Pokemon;
+import com.pokedex.model.PokemonComparisonResult;
 import com.pokedex.service.PokeApiService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+// Contrôleur web qui prépare les données envoyées à la vue et gère la recherche et la comparaison.
 @Controller
 public class PokedexController {
     private final PokeApiService pokeApiService;
@@ -38,11 +40,12 @@ public class PokedexController {
 
                 if (compare != null && !compare.isBlank()) {
                     Pokemon comparisonPokemon = pokeApiService.getPokemon(compare);
-                    int attackDifference = pokeApiService.getAttackDifference(search, compare);
+                    PokemonComparisonResult comparisonResult = pokeApiService.compareAttack(search, compare);
                     model.addAttribute("comparisonPokemon", comparisonPokemon);
-                    model.addAttribute("attackDifference", attackDifference);
-                    model.addAttribute("searchedAttack", pokeApiService.getAttackValue(search));
-                    model.addAttribute("comparedAttack", pokeApiService.getAttackValue(compare));
+                    model.addAttribute("comparisonResult", comparisonResult);
+                    model.addAttribute("attackDifference", comparisonResult.getDifference());
+                    model.addAttribute("searchedAttack", comparisonResult.getFirstAttack());
+                    model.addAttribute("comparedAttack", comparisonResult.getSecondAttack());
                 }
             } catch (Exception e) {
                 model.addAttribute("error", e.getMessage());

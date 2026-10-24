@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+// Client HTTP qui appelle PokéAPI pour récupérer les détails, la liste et les stats des Pokémon.
 @Component
 public class PokeApiClient {
     private static final String BASE_URL = "https://pokeapi.co/api/v2/pokemon";
