@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokédex</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #fff7d6, #dfefff);
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 980px;
+            margin: auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #d72323;
+        }
+        .search-form {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        input, select {
+            width: 220px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+        }
+        .secondary-button {
+            background: #f59e0b;
+        }
+        .card {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            margin-top: 30px;
+        }
+        .card img {
+            width: 220px;
+            height: 220px;
+            object-fit: contain;
+        }
+        .stats {
+            list-style: none;
+            padding: 0;
+        }
+        .stats li {
+            margin: 8px 0;
+        }
+        .compare-box {
+            margin-top: 20px;
+            background: #f8fafc;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .compare-box strong {
+            color: #1e3a8a;
+        }
+        .duel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+        .duel-card {
+            border: 1px solid #dfe7f3;
+            border-radius: 16px;
+            padding: 18px;
+            background: linear-gradient(180deg, #ffffff, #f8fbff);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.06);
+        }
+        .duel-card h3 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .duel-card img {
+            display: block;
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            margin: 0 auto 12px;
+        }
+        .duel-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .duel-card li {
+            margin: 6px 0;
+        }
+        .pokemon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .pokemon-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            background: #f9fafb;
+        }
+        .pokemon-item strong {
+            display: block;
+            margin-top: 6px;
+        }
+        .error {
+            color: #c0392b;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Pokédex</h1>
+
+    <form method="get" class="search-form">
+        <input type="text" name="search" placeholder="Ex : pikachu ou 25" th:value="${param.search != null ? param.search[0] : ''}" />
+        <select name="compare" th:value="${param.compare != null ? param.compare[0] : ''}">
+            <option value="">Choisir un Pokémon à comparer</option>
+            <option th:each="pokemonOption : ${pokemonList}"
+                    th:value="${pokemonOption.name}"
+                    th:text="${pokemonOption.id + ' - ' + pokemonOption.name}"
+                    th:selected="${param.compare != null and param.compare[0] == pokemonOption.name}">
+            </option>
+        </select>
+        <button type="submit">Chercher</button>
+    </form>
+
+    <div th:if="${pokemon != null}">
+        <div class="card">
+            <img th:src="${pokemon.imageUrl}" th:alt="${pokemon.name}" />
+            <div>
+                <h2 th:text="${pokemon.name}">Nom</h2>
+                <p><strong>N°</strong> <span th:text="${pokemon.id}"></span></p>
+                <p><strong>Taille :</strong> <span th:text="${pokemon.height / 10.0}"></span> m</p>
+                <p><strong>Poids :</strong> <span th:text="${pokemon.weight / 10.0}"></span> kg</p>
+                <p><strong>Types :</strong> <span th:text="${#strings.listJoin(pokemon.types, ' / ')}"></span></p>
+                <p><strong>Capacités :</strong> <span th:text="${#strings.listJoin(pokemon.abilities, ', ')}"></span></p>
+            </div>
+        </div>
+
+        <div class="compare-box" th:if="${comparisonPokemon != null and comparisonResult != null}">
+            <strong>Comparaison d'attaque :</strong>
+            <span th:text="${comparisonResult.message}"></span>
+        </div>
+
+        <div class="duel-grid" th:if="${comparisonPokemon != null and comparisonResult != null}">
+            <div class="duel-card">
+                <h3 th:text="${pokemon.name}">Pokémon 1</h3>
+                <img th:src="${pokemon.imageUrl}" th:alt="${pokemon.name}" />
+                <ul>
+                    <li><strong>N°</strong> <span th:text="${pokemon.id}"></span></li>
+                    <li><strong>Type :</strong> <span th:text="${#strings.listJoin(pokemon.types, ' / ')}"></span></li>
+                    <li><strong>Attaque :</strong> <span th:text="${searchedAttack}"></span></li>
+                    <li><strong>Taille :</strong> <span th:text="${pokemon.height / 10.0}"></span> m</li>
+                    <li><strong>Poids :</strong> <span th:text="${pokemon.weight / 10.0}"></span> kg</li>
+                </ul>
+            </div>
+
+            <div class="duel-card">
+                <h3 th:text="${comparisonPokemon.name}">Pokémon 2</h3>
+                <img th:src="${comparisonPokemon.imageUrl}" th:alt="${comparisonPokemon.name}" />
+                <ul>
+                    <li><strong>N°</strong> <span th:text="${comparisonPokemon.id}"></span></li>
+                    <li><strong>Type :</strong> <span th:text="${#strings.listJoin(comparisonPokemon.types, ' / ')}"></span></li>
+                    <li><strong>Attaque :</strong> <span th:text="${comparedAttack}"></span></li>
+                    <li><strong>Taille :</strong> <span th:text="${comparisonPokemon.height / 10.0}"></span> m</li>
+                    <li><strong>Poids :</strong> <span th:text="${comparisonPokemon.weight / 10.0}"></span> kg</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Statistiques</h3>
+        <ul class="stats">
+            <li th:each="stat : ${pokemon.stats}">
+                <span th:text="${stat.name}"></span> : <strong th:text="${stat.value}"></strong>
+            </li>
+        </ul>
+    </div>
+
+    <div th:if="${pokemonList != null}">
+        <h3>Les 50 premiers Pokémon</h3>
+        <div class="pokemon-grid">
+            <div class="pokemon-item" th:each="pokemonEntry : ${displayedPokemon}">
+                <span th:text="${pokemonEntry.id}"></span>
+                <strong th:text="${pokemonEntry.name}"></strong>
+            </div>
+        </div>
+
+        <form method="get" th:if="${hasMorePokemon}">
+            <input type="hidden" name="showAll" value="true" />
+            <button type="submit" class="secondary-button">Voir plus</button>
+        </form>
+    </div>
+
+    <div class="error" th:if="${error != null}" th:text="${error}"></div>
+</div>
+</body>
+</html>

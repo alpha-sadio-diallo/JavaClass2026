@@ -1,1 +1,7 @@
-com/java/vinci/demo/DemoApplication.class
+com\pokedex\model\Stat.class
+com\pokedex\service\PokeApiService.class
+com\pokedex\PokedexSpringBootApplication.class
+com\pokedex\app\PokedexApp.class
+com\pokedex\controller\PokedexController.class
+com\pokedex\model\Pokemon.class
+com\pokedex\api\PokeApiClient.class
